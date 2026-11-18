@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CareerMatch AI</title>
+<style>
+:root{--bg:#f6f7fb;--card:#fff;--ink:#1b1f2a;--mut:#667085;--line:#e4e7ee;--acc:#4f46e5;--ok:#12a36b;--warn:#d9822b;--bad:#d92d4a;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1020;--card:#171a2e;--ink:#eef0f6;--mut:#98a2b3;--line:#272b45;--acc:#8b8bff;--ok:#3ccf91;--warn:#f0a35c;--bad:#ff6b85}}
+:root[data-theme="dark"]{--bg:#0e1020;--card:#171a2e;--ink:#eef0f6;--mut:#98a2b3;--line:#272b45;--acc:#8b8bff;--ok:#3ccf91;--warn:#f0a35c;--bad:#ff6b85}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--card);z-index:10}
+nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:var(--card);border-bottom:1px solid var(--line)}
+nav div{max-width:1100px;margin:0 auto;padding:0 16px;display:flex;align-items:center;gap:2px;overflow-x:auto}
+nav .logo{font-weight:800;font-size:17px;margin-right:14px;color:var(--ink);padding:14px 0;text-decoration:none;white-space:nowrap}
+nav .logo span{color:var(--acc)}
+nav a.l{padding:15px 10px;color:var(--mut);text-decoration:none;font-weight:600;font-size:13px;border-bottom:2px solid transparent;white-space:nowrap}
+nav a.l.on{color:var(--acc);border-color:var(--acc)}
+.wrap{max-width:1100px;margin:0 auto;padding:22px 16px 30px}
+.view{display:none}.view.on{display:block}
+h2{font-size:22px;margin:0 0 4px}.sub{color:var(--mut);margin:0 0 18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
+.hero{background:linear-gradient(135deg,var(--acc),#1e1b4b);color:#fff;border-radius:18px;padding:36px 26px;margin-bottom:18px}
+.hero h1{font-size:32px;line-height:1.15;margin:0 0 10px;letter-spacing:-.02em}.hero p{margin:0 0 18px;max-width:600px;opacity:.92}
+.btn{display:inline-block;border:0;background:var(--acc);color:#fff;border-radius:10px;padding:9px 16px;font:inherit;font-weight:600;cursor:pointer;text-decoration:none}
+.btn.g{background:none;color:var(--acc);border:1px solid var(--line)}.btn:disabled{opacity:.5}
+.hero .btn{background:#fff;color:#1e1b4b}.hero .btn.g{background:none;color:#fff;border-color:#ffffff66;margin-left:8px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+@media(max-width:800px){.g3,.g2,.g4{grid-template-columns:1fr 1fr}.hero h1{font-size:26px}}
+@media(max-width:520px){.g3,.g2,.g4{grid-template-columns:1fr}}
+.g3 h3{margin:0 0 4px;font-size:16px}.g3 p{margin:0;color:var(--mut);font-size:14px}
+.stat b{display:block;font-size:26px}.stat span{color:var(--mut);font-size:13px}
+label{display:block;font-size:12px;font-weight:600;color:var(--mut);margin:14px 0 5px;text-transform:uppercase;letter-spacing:.04em}
+label.f{margin-top:0}
+input,select,textarea{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--ink);font:inherit}
+textarea{min-height:90px;font-size:13px;margin-top:8px}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.tag{background:color-mix(in srgb,var(--acc) 15%,transparent);color:var(--acc);padding:3px 9px;border-radius:99px;font-size:13px;cursor:pointer}
+.sug{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.sug button,.chipb{border:1px dashed var(--line);background:none;color:var(--mut);border-radius:99px;padding:3px 10px;font-size:12px;cursor:pointer}
+.drop{border:2px dashed var(--line);border-radius:12px;padding:20px;text-align:center;cursor:pointer;background:var(--bg)}
+.drop.over,.drop:hover{border-color:var(--acc)}.drop b{display:block;color:var(--acc)}.drop small,#rstat{color:var(--mut);font-size:12px}#rstat{display:block;margin-top:6px}
+.job{display:flex;gap:14px;margin-bottom:12px}
+.score{flex:0 0 58px;height:58px;border-radius:50%;display:grid;place-items:center;font-weight:700;background:conic-gradient(var(--c) calc(var(--p)*1%),var(--line) 0)}
+.score i{font-style:normal;width:46px;height:46px;border-radius:50%;background:var(--card);display:grid;place-items:center;font-size:14px}
+.job h3{margin:0;font-size:16px}.meta{color:var(--mut);font-size:13px}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.chip{font-size:12px;padding:2px 8px;border-radius:6px;border:1px solid var(--line)}.chip.y{color:var(--ok);border-color:var(--ok)}.chip.n{color:var(--warn);border-color:var(--warn)}.chip.b{color:var(--bad);border-color:var(--bad)}
+.why{font-size:13px;color:var(--mut);margin-top:6px}
+.acts,.lk{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.acts a,.lk a,.acts button{font:inherit;font-size:13px;font-weight:600;color:var(--acc);background:none;cursor:pointer;text-decoration:none;border:1px solid var(--line);border-radius:8px;padding:4px 10px}
+.acts a:hover,.lk a:hover,.acts button:hover{border-color:var(--acc)}.acts button.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+.bar{display:flex;flex-wrap:wrap;gap:12px;align-items:end;margin-bottom:14px}.bar>div{flex:1;min-width:140px}.bar label{margin-top:0}
+.pager{display:flex;justify-content:center;gap:6px;margin-top:6px;flex-wrap:wrap}
+.pager button{min-width:36px;padding:6px 10px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;cursor:pointer;font:inherit}
+.pager button.on{background:var(--acc);color:#fff;border-color:var(--acc)}.pager button:disabled{opacity:.4;cursor:default}
+.hd{display:flex;justify-content:space-between;color:var(--mut);font-size:13px;margin:6px 0 10px}
+.crs{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:12px 0;border-top:1px solid var(--line)}.crs:first-child{border-top:0}
+.crs small{color:var(--mut);display:block}
+.prog{height:8px;background:var(--line);border-radius:9px;overflow:hidden}.prog i{display:block;height:100%;background:var(--acc)}
+.row{display:flex;align-items:center;gap:10px;margin:8px 0;font-size:13px}.row span:first-child{flex:0 0 96px;color:var(--mut)}.row .prog{flex:1}
+.chat{height:360px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding:4px}
+.msg{max-width:85%;padding:8px 12px;border-radius:12px;white-space:pre-wrap;font-size:14px}
+.msg.user{align-self:flex-end;background:var(--acc);color:#fff}.msg.bot{align-self:flex-start;background:var(--bg);border:1px solid var(--line)}
+.send{display:flex;gap:8px;margin-top:10px}.send input{flex:1}
+.kan{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(210px,1fr);gap:10px;overflow-x:auto;padding-bottom:8px}
+.col{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px;min-height:120px}
+.col h4{margin:0 0 8px;font-size:13px;display:flex;justify-content:space-between}
+.app{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px;margin-bottom:8px;font-size:13px}
+.app b{display:block}.app input,.app select{margin-top:5px;padding:5px 7px;font-size:12px}
+.task{display:flex;gap:8px;align-items:flex-start;padding:5px 0;font-size:14px}.task input{width:auto;margin-top:4px}
+.task.done span{text-decoration:line-through;color:var(--mut)}
+.ai{white-space:pre-wrap;font-size:14px;margin-top:10px}
+.note{background:color-mix(in srgb,var(--warn) 12%,transparent);border:1px solid var(--warn);border-radius:10px;padding:8px 12px;font-size:13px;margin-bottom:12px}
+ul.cl{list-style:none;padding:0;margin:8px 0}ul.cl li{font-size:14px;padding:2px 0}.ok{color:var(--ok)}.no{color:var(--bad)}
+.hero{background:radial-gradient(circle at 85% 0,#7c3aed99,transparent 55%),linear-gradient(135deg,var(--acc),#1e1b4b)}
+nav{backdrop-filter:blur(10px)}.card{transition:border-color .15s,transform .15s}.card:hover{border-color:color-mix(in srgb,var(--acc) 45%,var(--line))}
+.cv{background:#fff;color:#111;padding:28px;min-height:420px;font-size:13px}.cv h1{margin:0;font-size:24px}.cv h4{margin:14px 0 4px;border-bottom:1px solid #ccc;font-size:12px;text-transform:uppercase;letter-spacing:.05em}.cv ul{margin:0;padding-left:18px}.cv .meta{color:#555}.cv p{margin:8px 0 0}
+.cv.cls{font-family:Georgia,serif}.cv.mod h1,.cv.mod h4{color:#4f46e5}.cv.mod h4{border-color:#4f46e5}
+@media print{body *{visibility:hidden}#cv,#cv *{visibility:visible}#cv{position:absolute;left:0;top:0;width:100%;border:0}}
+footer{color:var(--mut);font-size:12px;text-align:center;padding:10px 16px 24px}
+</style>
+</head>
+<body>
+<nav><div id="nav"></div></nav>
+<div class="wrap">
+
+<section class="view" id="v-login">
+  <div class="hero"><h1>Welcome to CareerMatch AI</h1><p>Log in to see jobs ranked for your own profile. Every account keeps its own profile, applications and roadmap.</p></div>
+  <div class="g2">
+    <div class="card"><h3 style="margin:0">Log in</h3><label>Email</label><input id="le" type="email" autocomplete="username"><label>Password</label><input id="lp" type="password" autocomplete="current-password">
+      <button class="btn" id="logBtn" style="margin-top:14px">Log in</button> <a href="#" id="forgot" style="margin-left:10px;font-size:13px">Forgot password?</a>
+      <div class="meta" id="lmsg" style="margin-top:8px"></div><div id="fgBox"></div></div>
+    <div class="card"><h3 style="margin:0">Create account</h3><label>Name</label><input id="rn" autocomplete="name"><label>Email</label><input id="re" type="email" autocomplete="username"><label>Password (8+ characters)</label><input id="rp" type="password" autocomplete="new-password">
+      <button class="btn" id="regBtn" style="margin-top:14px">Create account</button><div class="meta" id="rmsg" style="margin-top:8px"></div></div>
+  </div>
+  <div class="note" style="margin-top:14px">Passwords are scrambled with PBKDF2 and never stored as plain text. Accounts live in your claude.ai account (or this browser if you are not signed in there). This keeps accounts separate on one device, but it is not a server-side login, so it cannot stop a determined attacker who controls your device. The first account you create keeps the profile you already had.</div>
+</section>
+
+<section class="view" id="v-home">
+  <div class="hero"><h1>Your AI-powered career copilot.</h1>
+    <p>Upload your resume, see ranked jobs from real postings, close skill gaps, build a roadmap, practise interviews and track every application.</p>
+    <a class="btn" href="#profile">Build my profile</a><a class="btn g" href="#dashboard">Open dashboard</a></div>
+  <div class="g3">
+    <div class="card"><h3>Smart matching</h3><p>Weighted skill, title, experience and preference scoring with a clear reason for every match.</p></div>
+    <div class="card"><h3>Resume ATS check</h3><p>Compare your resume with any job description and see missing keywords and format issues.</p></div>
+    <div class="card"><h3>AI coach</h3><p>Roadmaps, a career chatbot and a mock interview with scored feedback.</p></div>
+    <div class="card"><h3>Application tracker</h3><p>A Kanban board from Saved to Selected, with notes and deadlines.</p></div>
+    <div class="card"><h3>Skill gaps</h3><p>Missing skills ranked by demand, each with a certificate course.</p></div>
+    <div class="card"><h3>Real postings</h3><p>Links to the original LinkedIn and Indeed listings and live search shortcuts.</p></div>
+  </div>
+</section>
+
+<section class="view" id="v-dashboard">
+  <h2>Dashboard</h2><p class="sub">Every number here is calculated from your own data.</p>
+  <div class="g4" id="dstats"></div>
+  <div class="g2" style="margin-top:16px"><div class="card" id="dtop"></div><div class="card" id="dstage"></div></div>
+</section>
+
+<section class="view" id="v-profile">
+  <h2>My Profile</h2><p class="sub">Saved to your account when you’re signed in to claude.ai, otherwise to this browser.</p>
+  <div class="g2">
+    <div class="card">
+      <label class="f">Resume (PDF, DOCX or TXT)</label>
+      <div class="drop" id="drop"><b>Drop a file or click to browse</b><small>Read in your browser</small><input id="file" type="file" accept=".pdf,.docx,.txt,.md" hidden></div>
+      <textarea id="paste" placeholder="…or paste your resume text here"></textarea>
+      <button class="btn" id="scan" style="margin-top:8px">Extract skills</button><span id="rstat"></span>
+    </div>
+    <div class="card">
+      <label class="f">Target role</label><input id="role">
+      <label>Your skills</label><input id="skillIn" placeholder="Type a skill, press Enter">
+      <div class="tags" id="tags"></div><div class="sug" id="sug"></div>
+      <label>Years of experience</label><input id="exp" type="number" min="0" max="30">
+      <label>Work mode</label><select id="mode"><option value="any">Any</option><option>Remote</option><option>Hybrid</option><option>Onsite</option></select>
+      <label>Min salary (k USD/yr, sample jobs only)</label><input id="sal" type="number" min="0" step="5">
+      <label>Location</label><input id="loc">
+      <a class="btn" href="#matches" style="margin-top:16px">See my matches →</a><div id="pvJobs" style="margin-top:14px"></div><button class="btn g" id="liveBtn" style="margin-top:8px">Check live search</button><div class="meta" id="liveChk" style="margin-top:6px"></div>
+    </div>
+  </div>
+</section>
+
+<section class="view" id="v-matches">
+  <h2>Job Matches</h2><p class="sub">Ranked by how well your profile fits each role.</p>
+  <div class="bar">
+    <div><label>Search</label><input id="q" placeholder="Title or company"></div>
+    <div><label>Listings</label><select id="src"><option value="live">Real postings (snapshot)</option><option value="all">Real + sample jobs</option></select></div>
+    <div><label>Sort</label><select id="sort"><option value="p">Best match</option><option value="t">Title A–Z</option></select></div>
+    <div><label>Work mode</label><select id="fm"><option value="">Any</option><option>Remote</option><option>Hybrid</option><option>Onsite</option></select></div><div><label>Min match</label><select id="fmin"><option value="0">Any</option><option value="40">40%+</option><option value="60">60%+</option><option value="70">70%+</option></select></div><div><label>Location contains</label><input id="fl" placeholder="e.g. Bengaluru"></div>
+  </div>
+  <div class="card" style="margin-bottom:14px"><b>Check live on the source site</b><div class="lk" id="live"></div>
+    <div class="meta" style="margin-top:8px">Postings are a dated snapshot of real listings. Use these links for the freshest results.</div></div>
+  <div class="card" style="margin-bottom:14px"><b>Match a real job you found</b>
+    <div class="meta">Found a vacancy on LinkedIn, Naukri, Indeed or a company site? Paste it here for an instant match score from your profile. This works anywhere, including this hosted page.</div>
+    <div class="g2"><div><label>Job title</label><input id="pt"></div><div><label>Company</label><input id="pc"></div></div>
+    <label>Link to the posting (optional)</label><input id="pu" placeholder="https://"><label>Job description</label><textarea id="pd" style="min-height:90px" placeholder="Paste the full description here"></textarea>
+    <div class="acts"><button id="pgo">Match this job</button><button class="btn g" id="rfr">Refresh live jobs</button></div><div id="pmOut"></div></div>
+  <div class="meta" id="liveStat" style="margin-bottom:8px"></div>
+  <div class="note" id="nolive" style="display:none"></div>
+  <div class="hd"><span id="count"></span><span>Skills are read from posting text when available, otherwise from the title</span></div>
+  <div id="out"></div><div class="pager" id="pager"></div>
+</section>
+
+<section class="view" id="v-gaps">
+  <h2>Skill Gaps</h2><p class="sub">Skills missing across your top 10 matches, most in-demand first.</p>
+  <div class="card" id="gaps"></div>
+  <p class="meta" style="margin-top:10px">Course names are suggestions. Check price and availability. Buttons open a Coursera search.</p>
+</section>
+
+<section class="view" id="v-resume">
+  <h2>Resume Analyzer</h2><p class="sub">An ATS-style check of your resume against a job description.</p>
+  <div class="g2">
+    <div class="card"><label class="f">Your resume text</label><textarea id="rtext" style="min-height:200px" placeholder="Upload on the Profile page or paste here"></textarea>
+      <label>Job description</label><textarea id="jd" style="min-height:140px" placeholder="Paste the job description"></textarea>
+      <button class="btn" id="analyze" style="margin-top:10px">Analyze</button> <button class="btn g" id="aiResume" style="margin-top:10px">AI suggestions</button></div>
+    <div class="card" id="atsOut"><p class="meta">Results appear here.</p></div>
+  </div>
+</section>
+
+<section class="view" id="v-roadmap">
+  <h2>Career Roadmap</h2><p class="sub">An AI-generated plan with tasks you can tick off.</p>
+  <div class="card"><div class="bar"><div><label>Timeframe</label><select id="hz"><option>30-day</option><option selected>90-day</option><option>6-month</option><option>12-month</option></select></div>
+    <div><button class="btn" id="genRoad">Generate roadmap</button></div></div>
+    <div id="roadOut"><p class="meta">No roadmap yet.</p></div></div>
+</section>
+
+<section class="view" id="v-assistant">
+  <h2>Career Assistant</h2><p class="sub">Ask about careers, skills, resumes or interviews.</p>
+  <div class="card"><div class="chat" id="chatlog"></div>
+    <div class="sug" id="chatSug"></div>
+    <div class="send"><input id="chatIn" placeholder="Ask anything about your career…"><button class="btn" id="chatBtn">Send</button></div></div>
+</section>
+
+<section class="view" id="v-interview">
+  <h2>Mock Interview</h2><p class="sub">Practise a question and get scored feedback.</p>
+  <div class="g2">
+    <div class="card"><div class="bar"><div><label>Question type</label><select id="itype"><option>technical</option><option>behavioral</option><option>HR</option></select></div>
+      <div><button class="btn" id="newQ">New question</button></div></div>
+      <p id="iq" style="font-weight:600">Press “New question”.</p>
+      <textarea id="ia" style="min-height:140px" placeholder="Type your answer"></textarea>
+      <button class="btn" id="grade" style="margin-top:8px">Get feedback</button><div id="fb"></div></div>
+    <div class="card"><b>History</b><div id="ihist" style="margin-top:8px"></div></div>
+  </div>
+</section>
+
+<section class="view" id="v-tracker">
+  <h2>Application Tracker</h2><p class="sub">Save jobs from the Matches page, then move them across the board.</p>
+  <div class="card" id="up" style="margin-bottom:12px"></div><input id="tq" placeholder="Search applications by title, company or notes" style="margin-bottom:12px"><div class="kan" id="kan"></div>
+</section>
+
+<section class="view" id="v-about">
+  <h2>About</h2><p class="sub">How it works and what is not included.</p>
+  <div class="card">
+    <p><b>Scoring.</b> Skills 50% (rarer skills weigh more), title 20%, experience 12%, work mode 9%, salary 9%. Resume ATS score: 50% skill match, 25% keyword match, 25% format checks.</p>
+    <p><b>AI features</b> (roadmap, assistant, mock interview, resume suggestions) are answered by Claude through this page and need you to be viewing it on claude.ai.</p>
+    <p><b>Not included.</b> Real login and password reset, email alerts and an admin dashboard (these need a secure backend), and verified salary data (needs a licensed API). Your data is saved to your claude.ai account or this browser, so there is no separate login.</p>
+    <p><b>Data.</b> Real postings are a dated snapshot with links to the source. Skills for them are inferred from the title.</p>
+    <button class="btn g" id="theme">Toggle light / dark</button></div>
+</section>
+<section class="view" id="v-saved"><h2>Saved Jobs</h2><p class="sub">Jobs you saved or are tracking.</p><div id="savedOut"></div></section>
+
+<section class="view" id="v-builder"><h2>Resume Builder</h2><p class="sub">Fill in the form, pick a template, then save as PDF.</p>
+  <div class="g2"><div class="card" id="cvf"></div><div>
+    <div class="acts" style="margin:0 0 10px"><button id="cvPrint">Print / Save as PDF</button><button id="cvDl">Download as HTML</button><button id="cvProf">Fill from my profile</button></div>
+    <div class="meta" id="cvMsg" style="margin-bottom:8px">In the print dialog choose “Save as PDF”. If nothing opens, use Download as HTML, open that file and press Ctrl+P.</div><div class="card cv" id="cv"></div></div></div></section>
+
+<section class="view" id="v-insights"><h2>Salary &amp; Market Insights</h2><p class="sub">Only what this app can honestly calculate, with the limits stated.</p>
+  <div class="note">No verified salary dataset is connected. The salaries below come from the app’s demo jobs and are <b>not market data</b>. Use the sources below for real figures.</div>
+  <div class="g2"><div class="card" id="insSk"></div><div class="card" id="insSal"></div></div>
+  <div class="card" style="margin-top:16px"><b>Check real salary data</b><div class="lk" id="insLk"></div><div class="meta" style="margin-top:8px">A live salary API (for example Adzuna) needs a free API key and a small backend. That is pending configuration.</div></div></section>
+
+<section class="view" id="v-projects"><h2>Projects &amp; Portfolio</h2><p class="sub">Project ideas ranked by how many of your skills they use.</p>
+  <div class="card" id="projHd" style="margin-bottom:14px"></div><div id="projOut"></div>
+  <div class="card"><b>Make your GitHub stand out</b><ul><li>Pin your 4–6 best repositories.</li><li>Write a README with a screenshot, what it does, how to run it and what you learned.</li><li>Commit regularly with clear messages.</li><li>Deploy at least one project and link the live demo.</li><li>Put your GitHub link on your resume.</li></ul></div></section>
+
+<section class="view" id="v-fresher"><h2>Internships &amp; Fresher Opportunities</h2><p class="sub">For students and entry-level job seekers.</p>
+  <div class="g2"><div class="card"><label class="f">Degree</label><input id="fr_deg" placeholder="e.g. B.Tech"><label>Branch / specialization</label><input id="fr_br" placeholder="e.g. Computer Science"><label>Graduation year</label><input id="fr_yr" type="number" min="2000" max="2040">
+    <label>Search internships and fresher jobs</label><div class="lk" id="frLk"></div></div>
+  <div class="card"><b>Placement preparation checklist</b><div id="frPl"></div></div></div>
+  <h3 style="margin:18px 0 8px">Entry-level sample jobs (demo data)</h3><div id="frJobs"></div></section>
+
+<section class="view" id="v-alerts"><h2>Notifications</h2><p class="sub">Calculated from your tracker, roadmap and matches. Each one appears once.</p><div id="alOut"></div></section>
+
+<section class="view" id="v-settings"><h2>Settings</h2><p class="sub">Alerts, appearance and your data.</p>
+  <div class="g2"><div class="card"><b>Alert categories</b><div id="setNf"></div><div class="note" style="margin-top:12px">Email alerts are pending configuration: they need a backend and an email service, which this page does not have.</div></div>
+  <div class="card"><b>Appearance</b><div style="margin:8px 0"><button class="btn g" id="theme2">Toggle light / dark</button></div>
+    <b>Your data</b><textarea id="dataBox" placeholder="Export shows your data here. Paste saved data and press Import."></textarea>
+    <div class="acts"><button id="exp">Export</button><button id="imp">Import</button><button id="wipe">Erase all my data</button></div><div class="meta" id="setMsg"></div></div></div>
+  <div class="card" style="margin-top:16px"><b>Account</b><div class="meta" id="acct"></div><div class="g2"><div><label>Current password</label><input id="cp" type="password" autocomplete="current-password"></div><div><label>New password (8+)</label><input id="np" type="password" autocomplete="new-password"></div></div>
+    <button class="btn" id="chPw" style="margin-top:12px">Change password</button><div class="meta" id="pwMsg" style="margin-top:6px"></div></div></section>
+</div>
+<footer>CareerMatch AI prototype · Verify listings on the source site</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+const h=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const JOBS=[
+{t:"Frontend Developer",c:"Lumen Labs",m:"Remote",s:80,e:2,sk:["javascript","react","css","html","typescript"]},
+{t:"Full Stack Engineer",c:"Northwind",m:"Hybrid",s:105,e:3,sk:["javascript","react","node","sql","aws"]},
+{t:"Data Analyst",c:"Brightpath",m:"Hybrid",s:70,e:1,sk:["sql","excel","python","tableau","statistics"]},
+{t:"Machine Learning Engineer",c:"Cortexa",m:"Remote",s:140,e:4,sk:["python","pytorch","machine learning","sql","docker"]},
+{t:"Data Scientist",c:"Helix Health",m:"Onsite",s:115,e:3,sk:["python","statistics","machine learning","sql","pandas"]},
+{t:"Backend Developer",c:"Stackwise",m:"Remote",s:95,e:3,sk:["python","django","postgresql","docker","rest"]},
+{t:"DevOps Engineer",c:"Cloudnine",m:"Remote",s:120,e:4,sk:["aws","docker","kubernetes","linux","ci/cd"]},
+{t:"UI/UX Designer",c:"Pixelhouse",m:"Hybrid",s:75,e:2,sk:["figma","user research","prototyping","css","design systems"]},
+{t:"Mobile Developer",c:"Appforge",m:"Onsite",s:100,e:2,sk:["react native","javascript","typescript","ios","android"]},
+{t:"Junior Web Developer",c:"Bluebird Studio",m:"Remote",s:55,e:0,sk:["html","css","javascript","git"]},
+{t:"Product Manager",c:"Orbit",m:"Hybrid",s:110,e:4,sk:["roadmapping","user research","sql","communication","agile"]},
+{t:"Cybersecurity Analyst",c:"Fortis",m:"Onsite",s:90,e:2,sk:["networking","linux","python","siem","security"]}
+];
+const FAM={fe:["javascript","react","html","css","typescript"],da:["sql","excel","python","tableau","statistics"],be:["python","django","postgresql","docker","rest"]};
+const LI="https://in.linkedin.com/jobs/view/",IND="https://www.indeed.com/viewjob?jk=";
+const IS="https://in.indeed.com/q-python-backend-developer-jobs.html",IL1="https://in.linkedin.com/jobs/python-developer-jobs-trivandrum",IL2="https://in.linkedin.com/jobs/c-c++-developer-jobs-thiruvananthapuram",IN2="https://in.indeed.com/Python-jobs-in-Thiruvananthapuram,-Kerala",ILF="https://www.linkedin.com/jobs/developer-jobs-thiruvananthapuram",TV="Thiruvananthapuram";
+const LIVE=[
+["Frontend Developer","RARR Technologies","Bengaluru","LinkedIn",LI+"frontend-developer-at-rarr-technologies-pvt-ltd-4451379919","fe"],
+["Senior Frontend Developer","Siemens Energy","Bengaluru","LinkedIn",LI+"senior-frontend-developer-at-siemens-energy-4415033046","fe"],
+["Frontend Developer","hackajob","Bengaluru","LinkedIn",LI+"frontend-developer-at-hackajob-4450920985","fe"],
+["Frontend Developer","StarZen","Gurugram","LinkedIn",LI+"frontend-developer-at-starzen-4451331667","fe"],
+["Frontend Developer","HuntingCube","Indore","LinkedIn",LI+"frontend-developer-at-huntingcube-4451350155","fe"],
+["Frontend Developer","Bajaj Broking","Bengaluru","LinkedIn",LI+"frontend-developer-at-bajaj-broking-4449514516","fe"],
+["Frontend Developer","iocombats","Bengaluru","LinkedIn",LI+"frontend-developer-at-iocombats-4451356772","fe"],
+["Frontend Developer","Duruper","Bengaluru","LinkedIn",LI+"frontend-developer-at-duruper-4449285631","fe"],
+["Frontend Developer","iocombats","Coimbatore","LinkedIn",LI+"frontend-developer-coimbatore-at-iocombats-4451351991","fe"],
+["Data Analyst","Petrofac","Chennai","LinkedIn",LI+"data-analyst-at-petrofac-4451128436","da"],
+["Data Analyst","Lan Mark Shops India","Kerala","Indeed",IND+"41828f37f6e3a63b","da"],
+["Data Analyst","TNS India Foundation","Telangana","Indeed",IND+"4ff78760d720b54a","da"],
+["Data Analyst (MIS)","Uni-Com India","Punjab","Indeed",IND+"ebbccc89d3a42400","da"],
+["Senior Data Analyst","Infobyd Software Solution","Uttar Pradesh","Indeed",IND+"46dd27614aea9135","da"],
+["Senior Data Analyst","SAVVI Sales and Service","Haryana","Indeed",IND+"e58e86dcb474ffb3","da"],
+["Python Developer","Axnol Digital Solutions","Thiruvananthapuram, Kerala","Indeed",IS,"be"],
+["Back End Developer","UST","Kochi, Kerala","Indeed",IS,"be"],
+["Python Developer","Texplorers","Hyderabad","Indeed",IS,"be"],
+["Python Backend Developer","Wexa AI","Hyderabad","Indeed",IS,"be"],
+["Python Backend Developer","Umruz Tech Solutions","Pune","Indeed",IS,"be"],
+["Python Backend Developer","AWL India","Noida","Indeed",IS,"be"],
+["Python Developer","MHTECHIN","Pune","Indeed",IS,"be"],
+["Python Developer","Techolution","Remote","Indeed",IS,"be"],
+["Junior Python Developer","Cuculus GmbH","Bengaluru","Indeed",IS,"be"],
+["Backend Developer","Parrot AI Private Limited","Remote","Indeed",IS,"be"],
+["Python Developer","Limish","Remote","Indeed",IS,"be"],
+["Python Backend Engineer","Algoworks Solutions","India","Indeed",IS,"be"],
+["Python Developer","CONNECTING 2 WORK",TV,"LinkedIn",IL1,"be","1 day ago"],
+["Python Django Developer","CONNECTING 2 WORK",TV,"LinkedIn",IL1,"be","3 days ago"],
+["Python ETL Developer","NR Consulting",TV,"LinkedIn",IL1,"be","3 weeks ago"],
+["Python/Node.js Developer","Shopalyst",TV,"LinkedIn",IL1,"be","2 weeks ago"],
+["Backend Python Developer (Remote)","Uplers",TV,"LinkedIn",IL1,"be","1 week ago"],
+["Python Developer","LogicPlum",TV,"LinkedIn",IL2,"be","2 days ago"],
+["Python Developer","Sequoia Applied Technologies",TV,"LinkedIn",IL2,"be","2 weeks ago"],
+["C/C++ and Python Developers","Brooklet Systems Pvt Ltd",TV,"LinkedIn",IL2,"be","1 day ago"],
+["Python Developer","FoundingMinds Software Private Limited",TV,"Indeed",IN2,"be",""],
+["Junior Software Developer","QUEST INNOVATIVE SOLUTIONS",TV,"Indeed",IN2,"be",""],
+["React Js Frontend Developer","CONNECTING 2 WORK",TV,"LinkedIn",ILF,"fe","1 month ago"],
+["Front end Developer","CONNECTING 2 WORK",TV,"LinkedIn",ILF,"fe","1 month ago"]
+].map(([t,c,loc,src,url,f,age])=>({t,c,loc,src,url,age,sk:FAM[f],live:1,srch:!/\/jobs\/view\/|viewjob/.test(url)}));
+JOBS.push(...LIVE);JOBS.forEach((j,i)=>j.id=i);
+const COURSES={javascript:["Meta Front-End Developer Professional Certificate","Meta"],react:["Meta React Basics","Meta"],css:["Responsive Web Design","freeCodeCamp"],html:["HTML, CSS and JavaScript for Web Developers","Johns Hopkins"],typescript:["TypeScript for Professionals","Coursera"],node:["Meta Back-End Developer Professional Certificate","Meta"],sql:["Google Data Analytics Professional Certificate","Google"],aws:["AWS Certified Cloud Practitioner","AWS"],excel:["Excel Skills for Business","Macquarie University"],python:["Python for Everybody","University of Michigan"],tableau:["Data Visualization with Tableau","UC Davis"],statistics:["Statistics with Python","University of Michigan"],pytorch:["Deep Learning with PyTorch","IBM"],"machine learning":["Machine Learning Specialization","Stanford / DeepLearning.AI"],docker:["Docker Foundations Professional Certificate","Docker"],pandas:["Data Analysis with Python","IBM"],django:["Django for Everybody","University of Michigan"],postgresql:["PostgreSQL for Everybody","University of Michigan"],rest:["APIs and REST fundamentals","Meta"],kubernetes:["Kubernetes Application Developer prep","Linux Foundation"],linux:["Linux Fundamentals","IBM"],"ci/cd":["DevOps and CI/CD","Google Cloud"],figma:["Google UX Design Professional Certificate","Google"],"user research":["Conduct UX Research","Google"],prototyping:["Build Wireframes and Low-Fidelity Prototypes","Google"],"design systems":["Design Systems","Coursera"],"react native":["Meta React Native","Meta"],ios:["iOS App Development","Meta"],android:["Android App Development","Meta"],git:["Version Control with Git","Atlassian"],roadmapping:["Digital Product Management","University of Virginia"],communication:["Business Communication","Coursera"],agile:["Agile with Atlassian Jira","Atlassian"],networking:["Google IT Support Professional Certificate","Google"],siem:["Google Cybersecurity Professional Certificate","Google"],security:["Google Cybersecurity Professional Certificate","Google"]};
+const SYN={js:"javascript",reactjs:"react","react.js":"react",nodejs:"node","node.js":"node",ml:"machine learning",postgres:"postgresql",k8s:"kubernetes",ux:"user research","amazon web services":"aws",cicd:"ci/cd",html5:"html",css3:"css"};
+const norm=s=>{s=s.trim().toLowerCase();return SYN[s]||s};
+const SUGG=["javascript","react","python","sql","aws","docker","figma","machine learning","typescript","node"];
+const STAGES=["Saved","Applied","Assessment","Interview","Offer Received","Selected","Rejected"];
+let S={skills:["javascript","react","css","html"],role:"Frontend Developer",exp:2,mode:"any",sal:60,loc:"India",resume:"",apps:{},road:null,iv:[]};
+let page=1,db=null,uid=null,AI=null,saveT;
+const PER=5,td=()=>new Date().toISOString().slice(0,10),setStage=(a,x)=>{a.stage=x;(a.h=a.h||[]).push([x,td()])};
+const df={};JOBS.forEach(j=>j.sk.forEach(k=>df[k]=(df[k]||0)+1));
+const idf=k=>Math.log(1+JOBS.length/(df[k]||1));
+const tok=s=>s.toLowerCase().split(/\W+/).filter(w=>w.length>2);
+const esc=s=>s.replace(/[.*+?^${}()|[\]\\\/]/g,"\\$&");
+const VOCAB=[...new Set([...JOBS.flatMap(j=>j.sk),...Object.values(SYN)])];
+const has=(t,k)=>new RegExp("(^|[^a-z0-9+#])"+esc(k)+"($|[^a-z0-9+#])").test(t);
+
+let FETCHED=[],liveT=null,liveKey="",liveMsg="";
+const API=/^(localhost|127\.0\.0\.1)$/.test(location.hostname);
+const J=id=>/^\d+$/.test(String(id))?JOBS[+id]:(FETCHED.find(j=>String(j.id)===String(id))||(S.jobs||{})[id]);
+const JJ=i=>J(i)||{t:"(job no longer available)",c:"",live:1};
+const livePool=()=>FETCHED.length?FETCHED:JOBS.filter(j=>j.url);
+const liveStatus=()=>location.protocol==="file:"?"You opened the HTML file directly, so live search is off. Run start.bat and open http://localhost:3000 instead.":API?liveMsg:"Live internet search is off on this page, so a saved snapshot is shown. Run the local server (see README) to see real, current vacancies for any role.";
+// ---------- persistence ----------
+function persist(){if(!cur)return;pv();badge();clearTimeout(saveT);saveT=setTimeout(async()=>{
+  const d=JSON.stringify({...S,resume:S.resume.slice(0,6000)});
+  try{if(db)await db.collection("data/users/"+uid).doc("s-"+cur.id).set({json:d});else localStorage.setItem("cm:"+cur.id,d)}catch(e){}},500)}
+function fill(){$("role").value=S.role;$("exp").value=S.exp;$("mode").value=S.mode;$("sal").value=S.sal;$("loc").value=S.loc;$("paste").value=S.resume;$("rtext").value=S.resume;drawTags()}
+let cur=null;
+const blank=()=>({skills:[],role:"",exp:0,mode:"any",sal:0,loc:"India",resume:"",apps:{},road:null,iv:[]});
+const hx=a=>[...new Uint8Array(a)].map(b=>b.toString(16).padStart(2,"0")).join("");
+const sha=async t=>hx(await crypto.subtle.digest("SHA-256",new TextEncoder().encode(t)));
+const hashPw=async(pw,salt)=>{const k=await crypto.subtle.importKey("raw",new TextEncoder().encode(pw),"PBKDF2",false,["deriveBits"]);return hx(await crypto.subtle.deriveBits({name:"PBKDF2",salt:new TextEncoder().encode(salt),iterations:100000,hash:"SHA-256"},k,256))};
+async function getAcc(){try{if(db){const d=await db.collection("data/users/"+uid).doc("accounts").get();return d.exists?JSON.parse(d.data().json):{}}return JSON.parse(localStorage.getItem("cm_acc")||"{}")}catch(e){return{}}}
+async function setAcc(A){try{const j=JSON.stringify(A);if(db)await db.collection("data/users/"+uid).doc("accounts").set({json:j});else localStorage.setItem("cm_acc",j)}catch(e){}}
+async function loadState(id,legacy){try{if(db){const x=await db.collection("data/users/"+uid).doc(legacy?"state":"s-"+id).get();return x.exists?x.data().json:null}return localStorage.getItem(legacy?"cm":"cm:"+id)}catch(e){return null}}
+async function enter(a,raw){
+  cur=a;try{localStorage.setItem("cm_cur",a.id)}catch(e){}
+  if(raw==null)raw=await loadState(a.id);
+  S=blank();if(raw){try{S={...S,...JSON.parse(raw)}}catch(e){}}
+  chat=[];chatPf="";curQ=null;$("chatlog").innerHTML="";$("iq").textContent="Press “New question”.";$("fb").innerHTML="";$("ia").value="";
+  FETCHED=[];liveKey="";fill();pv();$("lo").textContent="Log out ("+a.name.split(" ")[0]+")";["le","lp","rn","re","rp"].forEach(i=>$(i).value="");
+  location.hash="#home";route();loadLive(true)}
+async function init(){
+  try{if(window.claude){const u=await claude.use("user");db=await claude.use("db");AI=await claude.use("sample");if(u&&db)uid=await u.id();else db=null}}catch(e){db=null}
+  try{const id=localStorage.getItem("cm_cur");if(id){const A=await getAcc();if(A[id])return enter({id,name:A[id].name,email:A[id].email})}}catch(e){}
+  route()
+}
+$("regBtn").addEventListener("click",async()=>{
+  const n=$("rn").value.trim(),e=$("re").value.trim().toLowerCase(),pw=$("rp").value,m=$("rmsg");
+  if(!n||!/^\S+@\S+\.\S+$/.test(e)){m.textContent="Enter your name and a valid email.";return}
+  if(pw.length<8){m.textContent="Use a password of at least 8 characters.";return}
+  if(!window.crypto||!crypto.subtle){m.textContent="This browser can’t secure passwords here. Open the page over https.";return}
+  m.textContent="Creating…";const A=await getAcc(),id=(await sha(e)).slice(0,24);
+  if(A[id]){m.textContent="That email already has an account. Log in instead.";return}
+  const first=!Object.keys(A).length,salt=hx(crypto.getRandomValues(new Uint8Array(16)));
+  A[id]={name:n,email:e,salt,hash:await hashPw(pw,salt)};await setAcc(A);
+  await enter({id,name:n,email:e},first?await loadState(null,true):null)});
+$("logBtn").addEventListener("click",async()=>{
+  const e=$("le").value.trim().toLowerCase(),m=$("lmsg");if(!e||!$("lp").value){m.textContent="Enter your email and password.";return}
+  m.textContent="Checking…";const A=await getAcc(),id=(await sha(e)).slice(0,24),a=A[id];
+  const ok=a&&await hashPw($("lp").value,a.salt)===a.hash;
+  if(!ok){await new Promise(r=>setTimeout(r,700));m.textContent="Wrong email or password.";return}
+  await enter({id,name:a.name,email:e})});
+["lp","rp"].forEach(i=>$(i).addEventListener("keydown",e=>{if(e.key==="Enter")$(i==="lp"?"logBtn":"regBtn").click()}));
+$("forgot").addEventListener("click",e=>{e.preventDefault();$("fgBox").innerHTML='<div class="note" style="margin-top:10px">Emailed reset links need an email service, which is pending configuration. Until then, you can remove the account and start again. This <b>permanently deletes</b> that login and its saved data.</div><input id="fge" type="email" placeholder="Email of the account to remove"><button class="btn g" id="fgGo" style="margin-top:8px">Delete this account</button>';
+  $("fgGo").addEventListener("click",async()=>{const em=$("fge").value.trim().toLowerCase(),A=await getAcc(),id=(await sha(em)).slice(0,24);
+    if(!A[id]){$("lmsg").textContent="No account with that email.";return}
+    delete A[id];await setAcc(A);try{if(db)await db.collection("data/users/"+uid).doc("s-"+id).delete();else localStorage.removeItem("cm:"+id)}catch(x){}
+    $("fgBox").innerHTML="";$("lmsg").textContent="Account deleted. You can create a new one."})});
+function pv(){const el=$("pvJobs");if(!el)return;const t=ranked("all").slice(0,4);
+  el.innerHTML="<b>Live preview: your top matches right now</b>"+(t.map(r=>`<div class="row"><span style="flex:1;color:var(--ink)">${h(r.j.t)}<div class="meta">${h(r.j.c)}${r.j.loc?" · "+h(r.j.loc):""}</div></span><b>${r.p}%</b></div>`).join("")||"")+`<div class="meta">${h(liveStatus())}</div>`}
+function mapAdz(x){
+  const t=String(x.title||"").replace(/<[^>]+>/g,""),ex=extract(t+" "+String(x.desc||""));
+  return{id:"a"+String(x.id).replace(/[^\w-]/g,""),t,c:x.company||"Company not listed",loc:x.loc||"",src:"Adzuna",url:/^https?:\/\//.test(x.url||"")?h(x.url):"",posted:String(x.posted||""),pay:x.pay||"",sk:ex.skills,live:1,api:1}}
+$("liveBtn").addEventListener("click",async()=>{const m=$("liveChk");
+  if(location.protocol==="file:")return m.textContent="You opened the HTML file directly. Close it, double-click start.bat, and use http://localhost:3000.";
+  if(!API)return m.textContent="You are on the hosted page. It cannot reach the internet for live jobs; only the downloaded careermatch-live folder can. The listings shown here are a dated snapshot.";
+  m.textContent="Checking…";
+  try{const d=await(await fetch("/api/status")).json();
+    if(!d.configured)return m.textContent="Server is running but has no Adzuna keys. Create the .env file (README step 3), save it, close the black window and run start.bat again.";
+    const t=await fetch("/api/jobs?what="+encodeURIComponent(S.role||"developer")),j=await t.json();
+    m.textContent=t.ok?"Working. Adzuna returned "+j.results.length+" vacancies for “"+(S.role||"developer")+"”.":"Adzuna problem: "+j.error}
+  catch(e){m.textContent="Cannot reach the local server. Keep the black start.bat window open."}});
+async function loadLive(force){
+  if(!API||!cur)return;
+  const what=S.role.trim()||S.skills.slice(0,2).join(" "),where=/^india$/i.test(S.loc.trim())?"":S.loc.trim(),key=what+"|"+where;
+  if(!what){FETCHED=[];liveMsg="Enter a target role to search live vacancies.";return showLive()}
+  if(key===liveKey&&!force)return;liveKey=key;liveMsg="Searching the internet for “"+what+"”…";showLive();
+  try{const r=await fetch("/api/jobs?what="+encodeURIComponent(what)+"&where="+encodeURIComponent(where)),d=await r.json();
+    if(!r.ok)throw new Error(d.error||"server error");
+    FETCHED=d.results.map(mapAdz).filter(j=>j.url);
+    liveMsg=FETCHED.length?`Showing ${FETCHED.length} live vacancies from Adzuna for “${what}”${d.relaxed?" (none near "+where+", so these are country-wide)":where?" near "+where:""}, fetched ${new Date().toLocaleTimeString()}.`:`Adzuna returned no vacancies for “${what}”. Try a broader role name.`;
+  }catch(e){FETCHED=[];liveKey="";liveMsg="Live search failed: "+(e instanceof TypeError?"cannot reach the local server (is the start.bat window open?)":e.message)+". Showing the saved snapshot instead."}
+  showLive()}
+function showLive(){pv();badge();if(cur&&location.hash==="#matches")renderMatches()}
+function renderPm(){const L=(S.pm||[]).map(J).filter(Boolean).map(score);$("pmOut").innerHTML=L.map(card).join("")}
+function matchPasted(){
+  const t=$("pt").value.trim(),d=$("pd").value.trim(),u=$("pu").value.trim();
+  if(!t||d.length<30){$("pmOut").innerHTML='<p class="meta">Add a job title and paste the description (a few lines at least).</p>';return}
+  const id="p"+Date.now().toString(36);
+  (S.jobs=S.jobs||{})[id]={id,t,c:$("pc").value.trim()||"Company not listed",loc:"",src:"the web",url:/^https?:\/\//i.test(u)?h(u):"",sk:extract(t+" "+d).skills,live:1,api:1,pasted:1};
+  S.pm=[id,...(S.pm||[])].slice(0,5);persist();renderPm();$("pd").value=""}
+$("pgo").addEventListener("click",matchPasted);
+$("rfr").addEventListener("click",()=>{if(!API){$("liveStat").textContent=liveStatus();return}loadLive(true)});
+setInterval(()=>{if(API&&cur&&!document.hidden)loadLive(true)},10*60*1000);
+function badge(){const a=document.querySelector('nav a[data-r="alerts"]');if(a&&cur){const n=alerts().length;a.textContent="Alerts"+(n?" ("+n+")":"")}}
+const pf=()=>JSON.stringify([S.role,S.skills,S.exp,S.mode,S.loc,S.sal]);
+
+// ---------- scoring ----------
+function score(j){
+  const have=new Set(S.skills),hit=j.sk.filter(k=>have.has(k)),miss=j.sk.filter(k=>!have.has(k));
+  const tot=j.sk.reduce((a,k)=>a+idf(k),0),skill=tot?hit.reduce((a,k)=>a+idf(k),0)/tot:0;
+  const rt=new Set(tok(S.role)),jt=tok(j.t),title=rt.size&&jt.length?jt.filter(w=>rt.has(w)).length/jt.length:0;
+  const gap=j.e==null?0:j.e-S.exp,expFit=gap<=0?1:Math.max(0,1-gap*.3);
+  const modeFit=S.mode==="any"||!j.m||S.mode===j.m?1:.3;
+  const salFit=j.s==null||j.s>=S.sal?1:Math.max(0,1-(S.sal-j.s)/S.sal*2);
+  const p=.5*skill+.2*title+.12*expFit+.09*modeFit+.09*salFit;
+  const why=[];
+  if(j.live)why.push(j.api?"skills read from the posting text, so confirm in the posting":"skills inferred from the title, so confirm in the posting");
+  why.push(skill>=.6?"strong skill overlap":skill>0?"partial skill overlap":"no direct skill overlap");
+  if(title>0)why.push("title matches your target role");
+  if(gap>0)why.push(`wants ${j.e}+ yrs`);
+  if(modeFit<1)why.push(j.m.toLowerCase()+" work");
+  if(salFit<1)why.push("pay below your minimum");
+  return{j,p:Math.round(p*100),hit,miss,why,cov:j.sk.length?hit.length/j.sk.length:0};
+}
+function ranked(src){
+  const q=src?"":($("q").value||"").toLowerCase(),s=src||$("src").value;
+  let r=(s==="all"?[...livePool(),...JOBS.filter(j=>!j.url)]:livePool()).filter(j=>!q||(j.t+" "+j.c).toLowerCase().includes(q)).map(score);
+  if(!src)r=r.filter(x=>(!$("fm").value||x.j.m===$("fm").value)&&x.p>=+$("fmin").value&&(!$("fl").value||(x.j.loc||"").toLowerCase().includes($("fl").value.toLowerCase())));
+  return $("sort").value==="t"&&!src?r.sort((a,b)=>a.j.t.localeCompare(b.j.t)):r.sort((a,b)=>b.p-a.p);
+}
+const lnk=(n,u)=>`<a href="${u}" target="_blank" rel="noopener">${n} ↗</a>`;
+
+// ---------- matches ----------
+function card(r){
+  const j=r.j,c=r.p>=70?"var(--ok)":r.p>=40?"var(--acc)":"var(--warn)",a=S.apps[j.id];
+  const meta=j.live?[j.c,j.loc,"via "+j.src+(j.srch?" listing page, checked 16 Nov 2026":""),j.age?"site showed “"+j.age+"”":"",j.posted?"posted "+j.posted.slice(0,10):"",j.pay].filter(Boolean):[j.c,j.m,"$"+j.s+"k",j.e+"+ yrs","sample job"];
+  const q=encodeURIComponent(j.t),l=encodeURIComponent(S.loc);
+  const acts=(j.url?lnk(j.srch?"Find on "+j.src+" (search page)":"View posting on "+j.src,j.url):lnk("Search LinkedIn",`https://www.linkedin.com/jobs/search/?keywords=${q}&location=${l}`)+lnk("Search Indeed",`https://in.indeed.com/jobs?q=${q}&l=${l}`))
+   +`<button data-act="save" data-id="${j.id}" class="${a?"on":""}">${a?"★ Tracked ("+a.stage+")":"☆ Save"}</button>`
+   +(a&&a.stage==="Saved"?`<button data-act="applied" data-id="${j.id}">Mark applied</button>`:"")
+   +(r.miss.length?`<a href="#gaps">${r.miss.length} gap${r.miss.length>1?"s":""} →</a>`:"");
+  const more=r.miss.length>3?`<span class="chip n">+${r.miss.length-3} more</span>`:"";
+  return `<div class="card job"><div class="score" style="--p:${r.p};--c:${c}"><i>${r.p}%</i></div><div style="flex:1;min-width:0">
+  <h3>${h(j.t)}</h3><div class="meta">${h(meta.join(" · "))}</div>
+  <div class="chips">${r.hit.slice(0,4).map(k=>`<span class="chip y">✓ ${k}</span>`).join("")}${r.miss.slice(0,3).map(k=>`<span class="chip n">+ ${k}</span>`).join("")}${more}</div>
+  <div class="why">${r.why.join("; ")}.</div><div class="acts">${acts}</div></div></div>`;
+}
+function renderMatches(){
+  renderPm();
+  $("liveStat").textContent=liveStatus();
+  const GEN=new Set(["developer","engineer","senior","junior","manager"]),rt=new Set(tok(S.role).filter(w=>!GEN.has(w))),any=FETCHED.length>0||JOBS.some(j=>j.url&&tok(j.t).some(w=>rt.has(w)||(!rt.size&&GEN.has(w))));
+  $("nolive").style.display=S.role.trim()&&!any&&$("src").value==="live"?"block":"none";$("nolive").textContent=`No saved real postings match “${S.role}”. Set Listings to “Real + sample jobs”, or use the live search links above for current openings.`;
+  const res=ranked(),pages=Math.max(1,Math.ceil(res.length/PER));page=Math.min(page,pages);const s=(page-1)*PER;
+  $("count").textContent=res.length?`Showing ${s+1}–${Math.min(s+PER,res.length)} of ${res.length} roles`:"No roles found";
+  $("out").innerHTML=res.slice(s,s+PER).map(card).join("");
+  let b=`<button data-p="${page-1}" ${page<2?"disabled":""}>‹ Prev</button>`;
+  for(let i=1;i<=pages;i++)b+=`<button data-p="${i}" class="${i===page?"on":""}">${i}</button>`;
+  $("pager").innerHTML=b+`<button data-p="${page+1}" ${page>=pages?"disabled":""}>Next ›</button>`;
+  const rv=S.role.trim()||"jobs",r=encodeURIComponent(rv),l=encodeURIComponent(S.loc);
+  const slug=x=>x.toLowerCase().trim().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,""),ls=slug(S.loc);
+  $("live").innerHTML=[["LinkedIn",`https://www.linkedin.com/jobs/search/?keywords=${r}&location=${l}`],["Indeed",`https://in.indeed.com/jobs?q=${r}&l=${l}`],["Naukri",`https://www.naukri.com/${slug(rv)}-jobs${ls&&ls!=="india"?"-in-"+ls:""}`],["Google Jobs",`https://www.google.com/search?q=${r}+jobs+${l}&ibp=htl;jobs`]].map(([n,u])=>lnk(n,u)).join("");
+}
+const jobAct=e=>{
+  const b=e.target.closest("button[data-act]");if(!b)return;const id=b.dataset.id;
+  if(b.dataset.act==="save"){if(S.apps[id])delete S.apps[id];else {S.apps[id]={stage:"Saved",notes:"",date:"",h:[["Saved",td()]]};const jb=J(id);if(jb&&jb.api)(S.jobs=S.jobs||{})[id]=jb}}
+  else if(S.apps[id])setStage(S.apps[id],"Applied");
+  persist();route2();
+};
+const route2=()=>(({saved:renderSaved,fresher:renderFr})[location.hash.slice(1)]||renderMatches)();
+["out","savedOut","frJobs","pmOut"].forEach(i=>$(i).addEventListener("click",jobAct));
+$("pager").addEventListener("click",e=>{const p=+e.target.dataset.p;if(p){page=p;renderMatches();window.scrollTo(0,0)}});
+["q","src","sort","fm","fmin","fl"].forEach(id=>$(id).addEventListener("input",()=>{page=1;renderMatches()}));
+
+// ---------- gaps ----------
+function renderGaps(){
+  const cnt={};ranked("live").slice(0,10).forEach(r=>r.miss.forEach(k=>cnt[k]=(cnt[k]||0)+1));
+  const list=Object.entries(cnt).sort((a,b)=>b[1]-a[1]).slice(0,12);
+  const cvr=ranked("live").slice(0,5).map(r=>`<div class="row"><span style="flex:0 0 190px;color:var(--ink)">${h(r.j.t)} · ${h(r.j.c)}</span><div class="prog"><i style="width:${r.cov*100}%"></i></div><b>${Math.round(r.cov*100)}%</b></div>`).join("");
+  $("gaps").innerHTML="<b>Skill coverage for your top roles</b>"+cvr+'<hr style="border:0;border-top:1px solid var(--line);margin:14px 0 4px">'+(list.length?list.map(([k,n])=>{const c=COURSES[k]||[k+" certification course","Coursera"];
+    return `<div class="crs"><div><b>${h(k)}</b> <small>needed by ${n} of your top 10 matches</small>${c[0]} · ${c[1]}</div>${lnk("Get certified","https://www.coursera.org/search?query="+encodeURIComponent(c[0]))}</div>`}).join(""):'<p class="meta">No skill gaps in your top matches.</p>');
+}
+
+// ---------- profile ----------
+function drawTags(){
+  $("tags").innerHTML=S.skills.map(s=>`<span class="tag" data-s="${h(s)}" title="Remove">${h(s)} ×</span>`).join("")||'<span class="meta">No skills yet</span>';
+  $("sug").innerHTML=SUGG.filter(s=>!S.skills.includes(s)).slice(0,6).map(s=>`<button data-a="${s}">+ ${s}</button>`).join("");page=1;
+}
+function add(s){s=norm(s);if(s&&!S.skills.includes(s)){S.skills.push(s);drawTags();persist()}}
+$("skillIn").addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===","){e.preventDefault();add(e.target.value);e.target.value=""}});
+$("tags").addEventListener("click",e=>{const s=e.target.dataset.s;if(s){S.skills=S.skills.filter(x=>x!==s);drawTags();persist()}});
+$("sug").addEventListener("click",e=>{if(e.target.dataset.a)add(e.target.dataset.a)});
+[["role","role"],["exp","exp"],["mode","mode"],["sal","sal"],["loc","loc"]].forEach(([id,k])=>$(id).addEventListener("input",()=>{S[k]=["exp","sal"].includes(k)?(+$(id).value||0):$(id).value;page=1;if(k==="role"||k==="loc"){clearTimeout(liveT);liveT=setTimeout(()=>loadLive(),900)}persist()}));
+const ALIASES=Object.keys(SYN).filter(k=>k.length>2||["js","ml","ux"].includes(k));
+function extract(text){
+  const t=" "+text.toLowerCase().replace(/\s+/g," ")+" ";
+  const found=new Set(VOCAB.filter(k=>has(t,k)));ALIASES.forEach(a=>{if(has(t,a))found.add(SYN[a])});
+  const yrs=[...t.matchAll(/(\d{1,2})\+?\s*(?:years|yrs)/g)].map(m=>+m[1]).filter(n=>n<=30);
+  return{skills:[...found],years:yrs.length?Math.max(...yrs):null};
+}
+function apply(text,name){
+  const r=extract(text),st=$("rstat");S.resume=text.slice(0,20000);$("rtext").value=S.resume;
+  if(!r.skills.length){st.textContent="No known skills found in "+name+". Add them manually.";persist();return}
+  S.skills=r.skills;if(r.years!==null){S.exp=r.years;$("exp").value=r.years}drawTags();persist();
+  st.textContent="Found "+r.skills.length+" skills in "+name+(r.years!==null?" and "+r.years+" years of experience":"")+". Edit them if needed.";
+}
+async function readFile(f){
+  const st=$("rstat");st.textContent="Reading "+f.name+"…";
+  try{
+    const ext=f.name.split(".").pop().toLowerCase();let text="";
+    if(ext==="pdf"){
+      pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+      const pdf=await pdfjsLib.getDocument({data:await f.arrayBuffer()}).promise;
+      for(let i=1;i<=pdf.numPages;i++){const c=await(await pdf.getPage(i)).getTextContent();text+=c.items.map(x=>x.str).join(" ")+"\n"}
+    }else if(ext==="docx"){text=(await mammoth.extractRawText({arrayBuffer:await f.arrayBuffer()})).value}
+    else{text=await f.text()}
+    if(text.trim().length<20){st.textContent="Couldn’t read any text (scanned PDFs need OCR). Paste the text instead.";return}
+    $("paste").value=text.slice(0,20000);apply(text,f.name);
+  }catch(e){st.textContent="Couldn’t read that file. Try a TXT or paste the text instead."}
+}
+const drop=$("drop"),fi=$("file");
+drop.addEventListener("click",()=>fi.click());
+fi.addEventListener("change",()=>fi.files[0]&&readFile(fi.files[0]));
+["dragover","dragenter"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add("over")}));
+["dragleave","drop"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove("over")}));
+drop.addEventListener("drop",e=>{const f=e.dataTransfer.files[0];if(f)readFile(f)});
+$("scan").addEventListener("click",()=>{const t=$("paste").value;t.trim()?apply(t,"your pasted text"):$("rstat").textContent="Paste some resume text first."});
+
+// ---------- resume analyzer ----------
+const STOP=new Set("the and for with that this from are you our will your have has not but can all any who they their about into more than also able work team role years year experience skills using use must should strong good well".split(" "));
+function ats(res,jd){
+  const rl=res.toLowerCase(),jl=jd.toLowerCase();
+  const jdSk=VOCAB.filter(k=>has(jl,k)),hitSk=jdSk.filter(k=>has(rl,k)),missSk=jdSk.filter(k=>!has(rl,k));
+  const fr={};jl.split(/[^a-z0-9+#]+/).filter(w=>w.length>3&&!STOP.has(w)).forEach(w=>fr[w]=(fr[w]||0)+1);
+  const kws=Object.entries(fr).sort((a,b)=>b[1]-a[1]).slice(0,15).map(x=>x[0]),missK=kws.filter(k=>!rl.includes(k));
+  const sp=jdSk.length?hitSk.length/jdSk.length:.5,kp=kws.length?(kws.length-missK.length)/kws.length:.5;
+  const words=res.split(/\s+/).filter(Boolean).length;
+  const checks=[["Email address",/\S+@\S+\.\S+/.test(res)],["Phone number",/\+?\d[\d\s-]{8,}/.test(res)],["Experience or internship section",/experience|internship/i.test(res)],["Education section",/education|university|college|degree/i.test(res)],["Skills section",/skills/i.test(res)],["Projects section",/projects?/i.test(res)],[`Length 250–900 words (yours: ${words})`,words>=250&&words<=900]];
+  const fp=checks.filter(c=>c[1]).length/checks.length;
+  return{score:Math.round(100*(.5*sp+.25*kp+.25*fp)),hitSk,missSk,missK:missK.slice(0,10),checks};
+}
+$("analyze").addEventListener("click",()=>{
+  const res=$("rtext").value,jd=$("jd").value;
+  if(res.trim().length<30||jd.trim().length<30){$("atsOut").innerHTML='<p class="meta">Add your resume text and a job description first.</p>';return}
+  S.resume=res.slice(0,20000);persist();
+  const r=ats(res,jd);S.ats=r.score;const c=r.score>=70?"var(--ok)":r.score>=45?"var(--acc)":"var(--warn)";
+  $("atsOut").innerHTML=`<div class="job"><div class="score" style="--p:${r.score};--c:${c}"><i>${r.score}</i></div><div><b>ATS compatibility</b><div class="meta">50% skill match, 25% keyword match, 25% format checks</div></div></div>
+  <b>Skills found</b><div class="chips">${r.hitSk.map(k=>`<span class="chip y">✓ ${h(k)}</span>`).join("")||'<span class="meta">none</span>'}</div>
+  <b style="display:block;margin-top:10px">Skills missing from your resume</b><div class="chips">${r.missSk.map(k=>`<span class="chip b">${h(k)}</span>`).join("")||'<span class="meta">none</span>'}</div>
+  <b style="display:block;margin-top:10px">Other keywords to consider</b><div class="chips">${r.missK.map(k=>`<span class="chip n">${h(k)}</span>`).join("")||'<span class="meta">none</span>'}</div>
+  <b style="display:block;margin-top:10px">Format checks</b><ul class="cl">${r.checks.map(([n,ok])=>`<li class="${ok?"ok":"no"}">${ok?"✓":"✗"} ${h(n)}</li>`).join("")}</ul><div class="ai" id="aiRes"></div>`;
+});
+
+// ---------- AI helpers ----------
+const ctx=()=>`Target role: ${S.role}. Skills: ${S.skills.join(", ")||"none listed"}. Experience: ${S.exp} years. Preferred work mode: ${S.mode}. Location: ${S.loc}. Resume excerpt: ${S.resume.slice(0,600)||"none"}.`;
+const aiOff=el=>{el.innerHTML='<div class="note">AI features run through claude.ai and need you to be signed in and viewing this page there.</div>'};
+$("aiResume").addEventListener("click",async()=>{
+  const res=$("rtext").value,jd=$("jd").value;
+  if(!$("aiRes")){$("analyze").click()}
+  const out=$("aiRes");if(!out)return;
+  if(!AI){aiOff(out);return}
+  out.textContent="Thinking…";
+  try{const r=await AI(`You are a resume reviewer. Compare this resume with the job description. Give: 3 strengths, 3 weaknesses, and 5 specific edits to improve fit. Be concise and honest, do not invent experience.\n\nRESUME:\n${res.slice(0,6000)}\n\nJOB DESCRIPTION:\n${jd.slice(0,3000)}`,{onText:u=>out.textContent=u.text,cache:false});out.textContent=r.text}
+  catch(e){out.textContent="Couldn’t get suggestions ("+(e.code||"error")+")."}
+});
+
+// ---------- roadmap ----------
+function renderRoad(){
+  const R=S.road;if(!R){$("roadOut").innerHTML='<p class="meta">No roadmap yet. Press Generate.</p>';return}
+  let tot=0,done=0;R.phases.forEach(p=>p.tasks.forEach(t=>{tot++;if(t.done)done++}));
+  const pc=tot?Math.round(done/tot*100):0;
+  $("roadOut").innerHTML=(R.pf&&R.pf!==pf()?'<div class="note">Your profile changed since this roadmap was made. <button class="btn g" id="regen">Regenerate for my new profile</button></div>':"")+`<b>${h(R.hz)} plan for ${h(R.role)}</b> · ${done}/${tot} tasks (${pc}%)<div class="prog" style="margin:8px 0 14px"><i style="width:${pc}%"></i></div>`+
+   R.phases.map((p,i)=>`<h4 style="margin:12px 0 4px">${h(p.title)}</h4>`+p.tasks.map((t,j)=>`<label class="task ${t.done?"done":""}" style="text-transform:none;letter-spacing:0;font-size:14px;color:var(--ink);margin:0"><input type="checkbox" data-p="${i}" data-t="${j}" ${t.done?"checked":""}><span>${h(t.t)}</span></label>`).join("")).join("");
+}
+$("roadOut").addEventListener("click",e=>{if(e.target.id==="regen")$("genRoad").click()});
+$("roadOut").addEventListener("change",e=>{const i=e.target.dataset.p;if(i==null)return;S.road.phases[i].tasks[e.target.dataset.t].done=e.target.checked;persist();renderRoad()});
+$("genRoad").addEventListener("click",async()=>{
+  if(!AI){aiOff($("roadOut"));return}
+  const hz=$("hz").value,btn=$("genRoad");btn.disabled=true;$("roadOut").innerHTML='<p class="meta">Generating…</p>';
+  const miss=[...new Set(ranked("live").slice(0,5).flatMap(r=>r.miss))].join(", ");
+  try{
+    const r=await AI.json(`Create a ${hz} career roadmap. ${ctx()} Skills missing for their top matches: ${miss||"none"}. Return ONLY JSON: {"phases":[{"title":"...","tasks":["..."]}]} with 3 to 5 phases and 3 to 5 concrete tasks each, covering technologies, projects, certifications, interview preparation and applications.`,{cache:false});
+    S.road={hz,role:S.role,pf:pf(),phases:r.phases.map(p=>({title:String(p.title),tasks:p.tasks.map(t=>({t:String(t),done:false}))}))};persist();renderRoad();
+  }catch(e){$("roadOut").innerHTML='<p class="meta">Couldn’t generate a roadmap ('+h(e.code||"error")+'). Try again.</p>'}
+  btn.disabled=false;
+});
+
+// ---------- assistant ----------
+let chat=[],chatPf="";
+const CS=["Which skills should I learn first?","How can I improve my resume?","How do I prepare for a fresher interview?","What projects should I build?"];
+$("chatSug").innerHTML=CS.map(q=>`<button class="chipb">${q}</button>`).join("");
+$("chatSug").addEventListener("click",e=>{if(e.target.classList.contains("chipb"))send(e.target.textContent)});
+function addMsg(who,txt){const d=document.createElement("div");d.className="msg "+who;d.textContent=txt;$("chatlog").appendChild(d);$("chatlog").scrollTop=1e6;return d}
+async function send(txt){
+  txt=txt.trim();if(!txt)return;
+  if(!AI){aiOff($("chatSug"));return}
+  if(chatPf&&chatPf!==pf())addMsg("bot","↻ Profile updated. I’m now using your latest details.");chatPf=pf();chat.push({role:"user",content:txt});addMsg("user",txt);const el=addMsg("bot","…");$("chatIn").value="";
+  const msgs=chat.slice(-11).map((m,i,a)=>i===a.length-1?{...m,content:`You are a concise, practical career coach. Latest user profile (it may have changed since earlier messages, so use this version): ${ctx()} Be honest about uncertainty and never invent job listings or salaries.\n\n${m.content}`}:m);
+  try{const r=await AI(msgs,{onText:u=>{el.textContent=u.text;$("chatlog").scrollTop=1e6},cache:false});el.textContent=r.text;chat.push({role:"assistant",content:r.text})}
+  catch(e){el.textContent="Couldn’t get a reply ("+(e.code||"error")+").";chat.pop()}
+}
+$("chatBtn").addEventListener("click",()=>send($("chatIn").value));
+$("chatIn").addEventListener("keydown",e=>{if(e.key==="Enter")send($("chatIn").value)});
+
+// ---------- interview ----------
+let curQ=null,curPf="";
+function renderIv(){
+  if(curQ&&curPf!==pf()){curQ=null;$("iq").textContent="Your profile changed. Press “New question” for your updated role.";$("fb").innerHTML=""}
+  const L=S.iv.slice().reverse();
+  $("ihist").innerHTML=L.length?L.map(x=>`<div class="row"><span>${h(x.type)}</span><div class="prog"><i style="width:${x.score}%"></i></div><b>${x.score}</b></div><div class="meta" style="margin:-4px 0 8px">${h(x.q)}</div>`).join("")+`<div class="meta">Average: <b>${Math.round(S.iv.reduce((a,x)=>a+x.score,0)/S.iv.length)}</b>/100 over ${S.iv.length} answers</div>`:'<p class="meta">No answers yet.</p>';
+}
+$("newQ").addEventListener("click",async()=>{
+  if(!AI){aiOff($("fb"));return}
+  $("iq").textContent="Thinking…";$("fb").innerHTML="";$("ia").value="";
+  try{const r=await AI.json(`Give ONE ${$("itype").value} interview question for a ${S.role} candidate with ${S.exp} years of experience and these skills: ${S.skills.join(", ")||"none listed"}. Return ONLY JSON: {"q":"..."}`,{cache:false});curQ=String(r.q);curPf=pf();$("iq").textContent=curQ}
+  catch(e){$("iq").textContent="Couldn’t get a question. Try again."}
+});
+$("grade").addEventListener("click",async()=>{
+  const a=$("ia").value.trim();if(!curQ||a.length<10){$("fb").innerHTML='<p class="meta">Get a question and write an answer first.</p>';return}
+  if(!AI){aiOff($("fb"));return}
+  $("fb").innerHTML='<p class="meta">Evaluating…</p>';
+  try{
+    const r=await AI.json(`Question: ${curQ}\nCandidate answer: ${a}\nEvaluate for a ${S.role} interview. Score each criterion 0-10. Return ONLY JSON: {"relevance":n,"structure":n,"depth":n,"communication":n,"strengths":["..."],"improvements":["..."],"better_answer":"..."}`,{cache:false});
+    const cr=["relevance","structure","depth","communication"],sc=Math.round(cr.reduce((s,k)=>s+(+r[k]||0),0)/cr.length*10);
+    S.iv.push({q:curQ,type:$("itype").value,score:sc});S.iv=S.iv.slice(-20);persist();renderIv();
+    $("fb").innerHTML=`<h4 style="margin:14px 0 6px">Score: ${sc}/100</h4>`+cr.map(k=>`<div class="row"><span>${k}</span><div class="prog"><i style="width:${(+r[k]||0)*10}%"></i></div><b>${+r[k]||0}</b></div>`).join("")+
+     `<b>Strengths</b><ul>${(r.strengths||[]).map(x=>`<li>${h(x)}</li>`).join("")}</ul><b>To improve</b><ul>${(r.improvements||[]).map(x=>`<li>${h(x)}</li>`).join("")}</ul><b>A stronger answer</b><div class="ai">${h(r.better_answer||"")}</div>`;
+  }catch(e){$("fb").innerHTML='<p class="meta">Couldn’t evaluate ('+h(e.code||"error")+'). Try again.</p>'}
+});
+
+// ---------- tracker ----------
+function renderTracker(){
+  const tq=($("tq").value||"").toLowerCase(),ids=Object.keys(S.apps).filter(i=>!tq||(JJ(i).t+" "+JJ(i).c+" "+(S.apps[i].notes||"")).toLowerCase().includes(tq));renderUp();
+  $("kan").innerHTML=STAGES.map(st=>{const L=ids.filter(i=>S.apps[i].stage===st);
+    return `<div class="col"><h4>${st}<span>${L.length}</span></h4>`+L.map(i=>{const j=JJ(i),a=S.apps[i];
+      return `<div class="app"><b>${h(j.t)}</b>${h(j.c)}${j.url?` · ${lnk("open",j.url)}`:""}
+      <select data-id="${i}" data-f="stage">${STAGES.map(x=>`<option ${x===a.stage?"selected":""}>${x}</option>`).join("")}</select>
+      <input type="date" data-id="${i}" data-f="date" value="${h(a.date||"")}" title="Deadline or interview date">
+      <input data-id="${i}" data-f="notes" placeholder="Notes" value="${h(a.notes||"")}">
+      <div class="meta" style="margin-top:6px">${h((a.h||[]).map(x=>x[0]+" "+x[1]).join(" → "))}</div><button class="chipb" data-rm="${i}" style="margin-top:6px">Remove</button></div>`}).join("")+`</div>`}).join("");
+}
+$("kan").addEventListener("change",e=>{const i=e.target.dataset.id;if(i==null)return;const a=S.apps[i],f=e.target.dataset.f;f==="stage"?setStage(a,e.target.value):a[f]=e.target.value;persist();if(f==="stage")renderTracker()});
+$("tq").addEventListener("input",renderTracker);
+$("kan").addEventListener("click",e=>{const i=e.target.dataset.rm;if(i!=null){delete S.apps[i];persist();renderTracker()}});
+
+// ---------- dashboard ----------
+function renderDash(){
+  const comp=[S.skills.length>0,S.role.trim(),S.resume.length>50,S.loc.trim(),S.sal>0].filter(Boolean).length*20;
+  const top=ranked("live").slice(0,5),cov=top.length?Math.round(top.reduce((a,r)=>a+r.cov,0)/top.length*100):0;
+  const ids=Object.keys(S.apps),applied=ids.filter(i=>S.apps[i].stage!=="Saved").length;
+  let tot=0,done=0;if(S.road)S.road.phases.forEach(p=>p.tasks.forEach(t=>{tot++;if(t.done)done++}));
+  const rp=tot?Math.round(done/tot*100):0,iv=S.iv.length?Math.round(S.iv.reduce((a,x)=>a+x.score,0)/S.iv.length):null;
+  const stat=(n,l)=>`<div class="card stat"><b>${n}</b><span>${l}</span></div>`;
+  $("dstats").innerHTML=stat(comp+"%","Profile complete")+stat(cov+"%","Skill coverage (top 5)")+stat(ids.length,"Saved or tracked")+stat(applied,"Applications sent")+stat(rp+"%","Roadmap progress")+stat(iv===null?"–":iv,"Interview average")+stat(top[0]?top[0].p+"%":"–","Best match")+stat(S.skills.length,"Skills listed")+stat(S.ats==null?"–":S.ats,"Last ATS score")+stat(PROJ.filter(x=>(S.proj||{})[x[0]]==="Done").length,"Projects done")+stat(alerts().length,"Open alerts")+stat(Object.values(S.pl||{}).filter(Boolean).length+"/"+PL.length,"Placement prep");
+  $("dtop").innerHTML=`<b>Top recommendations</b>`+top.slice(0,3).map(r=>`<div class="row" style="margin:10px 0"><span style="flex:1;color:var(--ink)">${h(r.j.t)}<div class="meta">${h(r.j.c)}</div></span><b>${r.p}%</b></div><div class="prog"><i style="width:${r.p}%"></i></div>`).join("")+`<div class="acts"><a href="#matches">All matches →</a></div>`;
+  const mx=Math.max(1,...STAGES.map(s=>ids.filter(i=>S.apps[i].stage===s).length));
+  $("dstage").innerHTML=`<b>Applications by stage</b>`+STAGES.map(s=>{const n=ids.filter(i=>S.apps[i].stage===s).length;return `<div class="row"><span>${s}</span><div class="prog"><i style="width:${n/mx*100}%"></i></div><b>${n}</b></div>`}).join("")+`<div class="acts"><a href="#tracker">Open tracker →</a></div>`;
+}
+
+// ---------- extra modules ----------
+const PROJ=[
+["todo","Task manager web app","Beginner",["html","css","javascript"],"Build add, edit, delete and filter with saved data.","Shows DOM, state and UI basics."],
+["port","Personal portfolio site","Beginner",["html","css","git"],"Publish a responsive site about you and your work.","The first thing a recruiter can open."],
+["wthr","Weather dashboard with a public API","Beginner",["javascript","rest","html"],"Fetch and display data, handle errors and loading.","Proves you can work with APIs."],
+["shop","Storefront with cart and checkout flow","Intermediate",["react","css","javascript"],"Component design, state and routing.","Realistic product UI for interviews."],
+["blog","Full-stack blog with login","Intermediate",["node","sql","react"],"Auth, a database and a REST API end to end.","Shows full-stack ability."],
+["sale","Sales analytics dashboard","Intermediate",["sql","excel","tableau","python"],"Clean data, write queries, publish charts.","Core evidence for analyst roles."],
+["pred","Prediction model with a written report","Intermediate",["python","pandas","machine learning","statistics"],"Train, evaluate and explain a model.","Shows the full data-science workflow."],
+["dsgn","UX case study and clickable prototype","Intermediate",["figma","user research","prototyping"],"Research, wireframe, prototype and test.","Design portfolios are judged on process."],
+["cicd","Containerised app with CI pipeline","Advanced",["docker","ci/cd","aws"],"Dockerise, test automatically and deploy.","Shows DevOps and delivery skills."],
+["recs","Recommendation API","Advanced",["python","machine learning","docker","rest"],"Serve a model behind an API.","Shows ML in production."]];
+const PL=["Practise aptitude (quant, logical, verbal)","Solve 50 data-structure problems (arrays, strings, trees)","Revise SQL and one core subject (DBMS, OS or networks)","Put 2 projects on GitHub with a clear README","Run your resume through the ATS check","Do 3 mock interviews","Apply to 5 roles a week and track them"];
+const lab='style="text-transform:none;letter-spacing:0;font-size:14px;color:var(--ink);margin:0"';
+
+function renderSaved(){const r=Object.keys(S.apps).map(J).filter(Boolean).map(score).sort((a,b)=>b.p-a.p);$("savedOut").innerHTML=r.length?r.map(card).join(""):'<div class="card meta">Nothing saved yet. Use ☆ Save on the Job Matches page.</div>'}
+
+function renderUp(){const t=td(),L=Object.entries(S.apps).filter(([i,a])=>a.date&&a.date>=t).sort((a,b)=>a[1].date.localeCompare(b[1].date));
+  $("up").innerHTML="<b>Upcoming dates</b>"+(L.length?L.map(([i,a])=>`<div class="row"><span style="flex:0 0 90px">${h(a.date)}</span><span style="color:var(--ink)">${h(JJ(i).t)} · ${h(JJ(i).c)} (${h(a.stage)})</span></div>`).join(""):'<div class="meta">Add a date to an application to see it here.</div>')}
+
+function renderIns(){
+  const sk=Object.entries(df).sort((a,b)=>b[1]-a[1]).slice(0,10),mx=sk[0]?sk[0][1]:1;
+  $("insSk").innerHTML=`<b>Most-requested skills in this app’s ${JOBS.length} listings</b><div class="meta">Counted from the listings here. Skills for real postings are inferred from titles, so this is a small sample, not the job market.</div>`+sk.map(([k,n])=>`<div class="row"><span>${h(k)}</span><div class="prog"><i style="width:${n/mx*100}%"></i></div><b>${n}</b></div>`).join("");
+  const sj=JOBS.filter(j=>j.s!=null).sort((a,b)=>b.s-a.s),m=sj[0].s;
+  $("insSal").innerHTML=`<b>Demo salaries (USD, thousand per year)</b><div class="meta">Illustrative only. Your minimum is ${S.sal}k.</div>`+sj.map(j=>`<div class="row"><span style="flex:0 0 150px">${h(j.t)}</span><div class="prog"><i style="width:${j.s/m*100}%;${j.s<S.sal?"background:var(--warn)":""}"></i></div><b>${j.s}</b></div>`).join("");
+  $("insLk").innerHTML=[["Glassdoor Salaries","https://www.glassdoor.co.in/Salaries/index.htm"],["AmbitionBox (India)","https://www.ambitionbox.com/salaries"],["Levels.fyi","https://www.levels.fyi/"],["US BLS Occupational Outlook","https://www.bls.gov/ooh/"]].map(([n,u])=>lnk(n,u)).join("")}
+
+function renderProj(){
+  const P=S.proj=S.proj||{},lv={Beginner:0,Intermediate:1,Advanced:2},done=PROJ.filter(x=>P[x[0]]==="Done").length;
+  const L=PROJ.map(x=>({x,use:x[3].filter(k=>S.skills.includes(k)),nw:x[3].filter(k=>!S.skills.includes(k))})).sort((a,b)=>b.use.length-a.use.length||lv[a.x[2]]-lv[b.x[2]]);
+  $("projHd").innerHTML=`<b>${done} of ${PROJ.length} projects done</b><div class="prog" style="margin-top:8px"><i style="width:${done/PROJ.length*100}%"></i></div>`;
+  $("projOut").innerHTML=L.map(({x,use,nw})=>`<div class="card" style="margin-bottom:12px"><h3 style="margin:0 0 4px">${h(x[1])} <span class="chip">${x[2]}</span></h3><div class="why"><b>Goal:</b> ${h(x[4])}</div><div class="why"><b>Portfolio value:</b> ${h(x[5])}</div><div class="chips">${use.map(k=>`<span class="chip y">✓ ${h(k)}</span>`).join("")}${nw.map(k=>`<span class="chip n">learn ${h(k)}</span>`).join("")}</div><div class="acts"><select data-pj="${x[0]}" style="width:auto">${["Not started","In progress","Done"].map(o=>`<option ${o===(P[x[0]]||"Not started")?"selected":""}>${o}</option>`).join("")}</select></div></div>`).join("")}
+$("projOut").addEventListener("change",e=>{const k=e.target.dataset.pj;if(k){(S.proj=S.proj||{})[k]=e.target.value;persist();renderProj()}});
+
+function renderFr(){
+  const f=S.fr=S.fr||{};["deg","br","yr"].forEach(k=>$("fr_"+k).value=f[k]||"");
+  const r=encodeURIComponent(S.role||"developer"),l=encodeURIComponent(S.loc);
+  $("frLk").innerHTML=[["LinkedIn internships",`https://www.linkedin.com/jobs/search/?keywords=${r}&location=${l}&f_JT=I`],["Indeed freshers",`https://in.indeed.com/jobs?q=${r}+fresher&l=${l}`],["Internshala","https://internshala.com/internships"],["Naukri freshers","https://www.naukri.com/fresher-jobs"]].map(([n,u])=>lnk(n,u)).join("");
+  S.pl=S.pl||{};
+  $("frPl").innerHTML=PL.map((t,i)=>`<label class="task ${S.pl[i]?"done":""}" ${lab}><input type="checkbox" data-i="${i}" ${S.pl[i]?"checked":""}><span>${h(t)}</span></label>`).join("");
+  const j=ranked("all").filter(x=>x.j.e!=null&&x.j.e<=1);$("frJobs").innerHTML=j.length?j.map(card).join(""):'<div class="card meta">None.</div>'}
+["deg","br","yr"].forEach(k=>$("fr_"+k).addEventListener("input",e=>{(S.fr=S.fr||{})[k]=e.target.value;persist()}));
+$("frPl").addEventListener("change",e=>{S.pl[e.target.dataset.i]=e.target.checked;persist();renderFr()});
+
+const CVF=[["n","Full name"],["em","Email"],["ph","Phone"],["su","Summary","t"],["ed","Education (one line each)","t"],["ex","Experience (one line each)","t"],["pr","Projects (one line each)","t"]];
+function cvDraw(){
+  const c=S.cv=S.cv||{};CVF.forEach(([k])=>c[k]=$("cv_"+k).value);c.t=$("cv_t").value;
+  const sec=(t,k)=>c[k]?`<h4>${t}</h4><ul>${c[k].split("\n").filter(x=>x.trim()).map(x=>"<li>"+h(x)+"</li>").join("")}</ul>`:"";
+  $("cv").className="card cv "+c.t;
+  $("cv").innerHTML=`<h1>${h(c.n||"Your name")}</h1><div class="meta">${h([c.em,c.ph].filter(Boolean).join(" · "))}</div>`+(c.su?`<p>${h(c.su)}</p>`:"")+(S.skills.length?`<h4>Skills</h4><p>${h(S.skills.join(", "))}</p>`:"")+sec("Experience","ex")+sec("Projects","pr")+sec("Education","ed");
+  persist()}
+function renderBuilder(){
+  if(!$("cv_n")){$("cvf").innerHTML=`<label class="f">Template</label><select id="cv_t"><option value="cls">Classic (serif)</option><option value="mod">Modern (accent colour)</option></select>`+CVF.map(([k,n,t])=>`<label>${n}</label>`+(t?`<textarea id="cv_${k}" style="min-height:70px;margin-top:0"></textarea>`:`<input id="cv_${k}">`)).join("");
+    $("cvf").addEventListener("input",cvDraw)}
+  const c=S.cv||{};CVF.forEach(([k])=>$("cv_"+k).value=c[k]||"");$("cv_t").value=c.t||"cls";cvDraw()}
+$("cvProf").addEventListener("click",()=>{renderBuilder();const m=(S.resume.match(/[\w.+-]+@[\w-]+\.[\w.]+/)||[""])[0];if(m&&!$("cv_em").value)$("cv_em").value=m;if(!$("cv_su").value)$("cv_su").value=`Aspiring ${S.role} with ${S.exp} year(s) of experience in ${S.skills.slice(0,4).join(", ")}.`;cvDraw()});
+$("cvPrint").addEventListener("click",()=>{try{window.print()}catch(e){$("cvMsg").textContent="Printing is blocked here. Use Download as HTML instead."}});
+$("cvDl").addEventListener("click",async()=>{
+  try{const d=await claude.use("downloads");if(!d)throw 0;const c=S.cv||{};
+    await d.save({filename:"resume.html",data:`<!DOCTYPE html><meta charset="utf-8"><title>${h(c.n||"Resume")}</title><style>body{max-width:760px;margin:30px auto;font:14px/1.5 ${c.t==="mod"?"system-ui":"Georgia,serif"}}h4{border-bottom:1px solid #999;text-transform:uppercase;font-size:12px}</style>`+$("cv").innerHTML});
+  }catch(e){$("cvMsg").textContent="Download isn’t available here. Use Print / Save as PDF."}});
+
+function alerts(){
+  const A=[],nf=S.nf||{},d0=new Date(td());
+  Object.entries(S.apps).forEach(([i,a])=>{if(!a.date||["Selected","Rejected"].includes(a.stage)||nf.deadline===false)return;
+    const n=Math.round((new Date(a.date)-d0)/864e5),w=`${JJ(i).t} at ${JJ(i).c}`;
+    if(n>=0&&n<=7)A.push(["d"+i+a.date,"Date",`${a.stage} date for ${w} is ${n===0?"today":"in "+n+" day"+(n>1?"s":"")} (${a.date}).`]);
+    else if(n<0)A.push(["o"+i+a.date,"Overdue",`The date for ${w} (${a.date}) has passed. Update its status.`])});
+  if(nf.road!==false&&S.road){const t=S.road.phases.flatMap(p=>p.tasks).find(x=>!x.done);if(t)A.push(["r"+t.t,"Roadmap","Next roadmap task: "+t.t])}
+  if(nf.match!==false)ranked("live").filter(r=>r.p>=70&&!S.apps[r.j.id]).slice(0,3).forEach(r=>A.push(["m"+r.j.id,"Match",`${r.j.t} at ${r.j.c} matches ${r.p}% of your profile and isn’t saved yet.`]));
+  if(nf.profile!==false&&S.resume.length<=50)A.push(["p","Profile","Upload or paste your resume so matches use your real skills."]);
+  const dis=S.dis||[];return A.filter(a=>!dis.includes(a[0]))}
+function renderAl(){const A=alerts();$("alOut").innerHTML=A.length?A.map(([k,c,m])=>`<div class="card row" style="margin-bottom:10px"><span style="flex:0 0 80px"><span class="chip">${c}</span></span><span style="flex:1;color:var(--ink)">${h(m)}</span><button class="chipb" data-k="${h(k)}">Dismiss</button></div>`).join(""):'<div class="card meta">You’re all caught up.</div>'}
+$("alOut").addEventListener("click",e=>{const k=e.target.dataset.k;if(k){S.dis=[...(S.dis||[]),k].slice(-200);persist();renderAl()}});
+
+function renderSet(){const nf=S.nf=S.nf||{};$("acct").textContent="Signed in as "+cur.name+" ("+cur.email+")";$("setNf").innerHTML=[["deadline","Deadlines and interviews"],["match","New strong matches"],["road","Roadmap tasks"],["profile","Profile reminders"]].map(([k,n])=>`<label class="task" ${lab}><input type="checkbox" data-nf="${k}" ${nf[k]!==false?"checked":""}><span>${n}</span></label>`).join("")}
+$("setNf").addEventListener("change",e=>{const k=e.target.dataset.nf;if(k){S.nf[k]=e.target.checked;persist()}});
+$("chPw").addEventListener("click",async()=>{const m=$("pwMsg"),A=await getAcc(),a=A[cur.id];
+  if(!a||await hashPw($("cp").value,a.salt)!==a.hash){m.textContent="Current password is wrong.";return}
+  if($("np").value.length<8){m.textContent="Use at least 8 characters.";return}
+  a.salt=hx(crypto.getRandomValues(new Uint8Array(16)));a.hash=await hashPw($("np").value,a.salt);await setAcc(A);$("cp").value=$("np").value="";m.textContent="Password changed."});
+$("theme2").addEventListener("click",()=>$("theme").click());
+$("exp").addEventListener("click",()=>{$("dataBox").value=JSON.stringify(S);$("setMsg").textContent="Copy this text to keep a backup."});
+$("imp").addEventListener("click",()=>{try{S={...S,...JSON.parse($("dataBox").value)};fill();persist();$("setMsg").textContent="Imported."}catch(e){$("setMsg").textContent="That isn’t valid saved data."}});
+$("wipe").addEventListener("click",e=>{const b=e.target;if(b.dataset.s){S={skills:[],role:"",exp:0,mode:"any",sal:0,loc:"",resume:"",apps:{},road:null,iv:[]};fill();persist();b.textContent="Erase all my data";delete b.dataset.s;$("setMsg").textContent="Erased."}else{b.dataset.s=1;b.textContent="Click again to confirm"}});
+
+// ---------- router ----------
+const NAV=[["home","Home"],["dashboard","Dashboard"],["profile","Profile"],["matches","Job Matches"],["gaps","Skill Gaps"],["resume","Resume"],["roadmap","Roadmap"],["assistant","Assistant"],["interview","Interview"],["tracker","Tracker"],["saved","Saved"],["builder","Resume Builder"],["insights","Insights"],["projects","Projects"],["fresher","Freshers"],["alerts","Alerts"],["settings","Settings"],["about","About"]];
+$("nav").innerHTML=`<a class="logo" href="#home">Career<span>Match</span> AI</a>`+NAV.map(([r,n])=>`<a class="l" href="#${r}" data-r="${r}">${n}</a>`).join("")+'<a class="l" href="#" id="lo" style="margin-left:auto">Log out</a>';
+$("lo").addEventListener("click",e=>{e.preventDefault();cur=null;FETCHED=[];try{localStorage.removeItem("cm_cur")}catch(x){}S=blank();location.hash="";route()});
+function route(){
+  const li=!!cur;document.querySelector("nav").style.display=li?"":"none";$("v-login").classList.toggle("on",!li);
+  if(!li){NAV.forEach(([x])=>$("v-"+x).classList.remove("on"));window.scrollTo(0,0);return}
+  let r=location.hash.slice(1);if(!NAV.some(n=>n[0]===r))r="home";
+  NAV.forEach(([x])=>{$("v-"+x).classList.toggle("on",x===r);document.querySelector(`nav a[data-r="${x}"]`).classList.toggle("on",x===r)});
+  ({dashboard:renderDash,matches:renderMatches,gaps:renderGaps,roadmap:renderRoad,interview:renderIv,tracker:renderTracker,saved:renderSaved,builder:renderBuilder,insights:renderIns,projects:renderProj,fresher:renderFr,alerts:renderAl,settings:renderSet})[r]?.();
+  if(["matches","profile","dashboard"].includes(r))loadLive();
+  badge();
+  window.scrollTo(0,0);
+}
+addEventListener("hashchange",route);
+$("theme").addEventListener("click",()=>{const d=document.documentElement,dark=d.dataset.theme==="dark"||(!d.dataset.theme&&matchMedia("(prefers-color-scheme:dark)").matches);d.dataset.theme=dark?"light":"dark"});
+fill();route();init();
+</script>
+</body>
+</html>
